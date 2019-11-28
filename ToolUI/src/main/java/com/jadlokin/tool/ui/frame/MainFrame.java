@@ -1,20 +1,19 @@
 package com.jadlokin.tool.ui.frame;
 
+import com.jadlokin.tool.ui.listener.MainFrameComponentListener;
 import com.jadlokin.tool.ui.listener.MoveListener;
 import com.jadlokin.tool.util.Image;
 import com.jadlokin.tool.util.Point;
 import com.jadlokin.tool.wallpaper.entity.Wallpaper;
-import com.sun.awt.AWTUtilities;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Area;
-import java.io.IOException;
 
 @Slf4j
 @Component
@@ -28,11 +27,26 @@ public class MainFrame extends JFrame {
 	public MainFrame(Wallpaper wallpaper,
 					 @Value("${x0}") Integer x0,
 					 @Value("${y0}") Integer y0,
-					 @Value("${main-image-path}") String backgroundImagePath) {
-		log.info("frame start to init");
+					 @Value("${main-image-path}") String backgroundImagePath,
+					 @Lazy MainFrameComponentListener mainFrameComponentListener,
+					 @Lazy MoveListener moveListener,
+					 ImagePanel imagePanel
+	) {
+		super("ShapedWindow");
 		this.wallpaper = wallpaper;
 		ORIGIN = new Point(x0, y0);
-		initFrame(backgroundImagePath);
+		backgroundImage = new Image(backgroundImagePath);
+
+		initFrame();
+		moveToOrigin();
+
+		addComponentListener(mainFrameComponentListener);
+		addMouseListener(moveListener);
+		addMouseMotionListener(moveListener);
+
+		add(imagePanel);
+//		add(new JButton("I am a Button"));
+		setVisible(true);
 	}
 
 	public void updateWallpaper() {
@@ -43,37 +57,21 @@ public class MainFrame extends JFrame {
 		System.exit(0);
 	}
 
-	public void openImage() throws IOException{
+	public void openImage() {
 		wallpaper.openImage();
 	}
 
-	private void initBackgroundImage() {
-		Shape shape = new Area(new Rectangle(0,0,1,1));
-		this.setSize(0, 0);
-	}
-
-	private void initBackgroundImage(String backgroundImagePath) {
-		backgroundImage = new Image(backgroundImagePath);
-		Shape shape = backgroundImage.toShape();
-		//设定窗体大小和图片一样大
-		this.setSize(backgroundImage.getWidth(), backgroundImage.getHeight());
-		//调用AWTUtilities的setWindowShape方法设定本窗体为制定的Shape形状
-		AWTUtilities.setWindowShape(this,shape);
-	}
-
-	private void initFrame(String backgroundImagePath) {
-		AWTUtilities.setWindowOpacity(this, 1.0f);
-		//设定禁用窗体装饰，这样就取消了默认的窗体结构
-		this.setUndecorated(true);
+	private void initFrame() {
 		//置顶
 		setAlwaysOnTop(true);
 		setType(java.awt.Window.Type.UTILITY);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		initBackgroundImage(backgroundImagePath);
-		moveToOrigin();
-
-		setVisible(true);
+		//布局
+//		setLayout(new GridBagLayout());
+		setLayout(null);
+		//设定禁用窗体装饰，这样就取消了默认的窗体结构
+		setUndecorated(true);
+		//设定窗体大小和图片一样大
+		setSize(backgroundImage.getWidth(), backgroundImage.getHeight());
 	}
 
 	/* 我们可以选择在窗体上绘制图片，是窗体完全呈现出图片的样式，
@@ -93,4 +91,7 @@ public class MainFrame extends JFrame {
 		setLocation(point);
 	}
 
+	public Image getBackgroundImage() {
+		return backgroundImage;
+	}
 }

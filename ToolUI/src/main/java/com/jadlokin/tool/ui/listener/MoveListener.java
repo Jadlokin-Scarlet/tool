@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.io.IOException;
 
 @Component
 public class MoveListener implements MouseMotionListener, MouseListener {
@@ -20,8 +19,6 @@ public class MoveListener implements MouseMotionListener, MouseListener {
 	@Autowired
 	public MoveListener(MainFrame mainFrame) {
 		this.mainFrame = mainFrame;
-		mainFrame.addMouseListener(this);
-		mainFrame.addMouseMotionListener(this);
 	}
 
 	@Override
@@ -29,11 +26,7 @@ public class MoveListener implements MouseMotionListener, MouseListener {
 		if(e.getButton()==MouseEvent.BUTTON3){
 			mainFrame.close();
 		}else if(e.getButton()==MouseEvent.BUTTON1){
-			try {
-				mainFrame.openImage();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			mainFrame.openImage();
 		}
 	}
 

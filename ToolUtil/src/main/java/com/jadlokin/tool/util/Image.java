@@ -26,7 +26,7 @@ public class Image {
 		height=bufferedImage.getHeight(null);//图像高度
 	}
 
-	public int[] getData() {
+	private int[] getData() {
 		PixelGrabber pixelGrabber = new PixelGrabber(bufferedImage, 0, 0, -1, -1, true);
 		try {
 			pixelGrabber.grabPixels();
@@ -37,11 +37,15 @@ public class Image {
 	}
 
 	public Shape toShape() {
+		return getShapeArea();
+	}
+
+	public Area getShapeArea() {
 		Area area=new Area();
 		int[] pixels = getData();
 		for(int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
-				if (getAlpha(pixels[i * width + j]) > 64) {
+				if (getAlpha(pixels[i * width + j]) > 96) {
 					Rectangle rectangle = new Rectangle(j, i, 1, 1);
 					area.add(new Area(rectangle));
 				}
